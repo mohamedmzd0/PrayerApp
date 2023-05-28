@@ -1,0 +1,9 @@
+<resources>
+
+
+    <!--esafirm imagepicker-->
+    <string name="images">Images</string>
+    <string name="choose_image">Choose Image</string>
+
+
+</resources>
