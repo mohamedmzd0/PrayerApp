@@ -16,13 +16,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 private const val TAG = "LocationHelper"
 
 class LocationHelper(
     private val activity: Activity,
     private val onLocationReceived: (Pair<Double, Double>?) -> Unit,
-    private val showPermissionDeniedDialog: (() -> Unit)?=null
+    private val showPermissionDeniedDialog: (() -> Unit)? = null
 ) {
     companion object {
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
@@ -65,6 +66,21 @@ class LocationHelper(
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
+    private fun showAlertOpenGps() {
+        MaterialAlertDialogBuilder(activity)
+            .setTitle("GPS is disabled")
+            .setMessage("Please enable GPS to get your location")
+            .setPositiveButton("Open GPS") { dialog, _ ->
+                dialog.dismiss()
+                openGpsSettings()
+            }
+            .setNegativeButton("Exit") { dialog, _ ->
+                activity.finishAffinity()
+            }
+            .setCancelable(false)
+            .create().show()
+    }
+
     private fun openGpsSettings() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         activity.startActivity(intent)
@@ -79,7 +95,7 @@ class LocationHelper(
         if (!isGpsEnabled()) {
             Log.e(TAG, "getCurrentLocation: not gps")
             onLocationReceived.invoke(null)
-            openGpsSettings()
+            showAlertOpenGps()
             return
         }
         fusedLocationClient.lastLocation
@@ -113,11 +129,11 @@ class LocationHelper(
             LocationRequest.PRIORITY_HIGH_ACCURACY,
             null
         ).addOnSuccessListener { location: Location? ->
-                if (location == null) {
-                    onLocationReceived.invoke(null)
-                } else
-                    onLocationReceived(Pair(location.latitude, location.longitude))
-            }
+            if (location == null) {
+                onLocationReceived.invoke(null)
+            } else
+                onLocationReceived(Pair(location.latitude, location.longitude))
+        }
             .addOnFailureListener { exception: Exception ->
                 onLocationReceived.invoke(null)
                 Log.e(TAG, "getCurrentLocation: ", exception)
@@ -133,7 +149,7 @@ class LocationHelper(
             // GPS is enabled, proceed to get current location
             getCurrentLocation()
         } else {
-            openGpsSettings()
+            showAlertOpenGps()
         }
     }
 
@@ -153,15 +169,5 @@ class LocationHelper(
         }
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == GPS_SETTINGS_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                // GPS was enabled by the user, proceed to get current location
-                getCurrentLocation()
-            } else {
-                // GPS was not enabled by the user
-                // Handle the denial or display a message to the user
-            }
-        }
-    }
+
 }

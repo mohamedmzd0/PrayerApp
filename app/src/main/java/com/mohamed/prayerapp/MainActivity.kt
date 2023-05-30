@@ -5,6 +5,7 @@ import android.content.Intent
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import com.app.base.BaseActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -18,6 +19,12 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        checkRequest()
+    }
+
+
 
     private val viewModel: PrayersTimeViewModel by viewModels()
     private val locationHelper: LocationHelper by lazy {
@@ -29,12 +36,6 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
     }
 
 
-    override fun onStart() {
-        super.onStart()
-
-        checkRequest()
-
-    }
 
     private fun showPermissionDeniedDialog() {
         MaterialAlertDialogBuilder(this)
@@ -63,19 +64,6 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
         } else {
             // Location permission is already granted, proceed to check GPS status
             locationHelper.checkGpsStatus()
-        }
-    }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == LocationHelper.GPS_SETTINGS_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                // GPS was enabled by the user, proceed to get current location
-                locationHelper.getCurrentLocation()
-            } else {
-//                locationHelper.openGpsSettings()
-            }
         }
     }
 

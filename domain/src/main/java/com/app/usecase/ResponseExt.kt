@@ -24,16 +24,9 @@ inline fun <T, R> Flow<Response<BaseEndPointResponse<T>>>.transformResponseData(
             response.code() in 401..499 && response.errorBody() == null ->
                 throw Throwable(ErrorAPI.BAD_REQUEST)
             response.code() in 500..599 -> throw Throwable(ErrorAPI.SERVER_ERROR)
-            else -> throw Exception().handleException()
+            else -> throw Exception()
         }
     }
 }
 
 
-fun Throwable.handleException(): Throwable {
-    return if (this is AndroidException || this is RemoteException || this is BindException || this is PortUnreachableException || this is SocketTimeoutException || this is UnknownServiceException || this is UnknownHostException || this is IOException || this is ConnectException || this is NoRouteToHostException) {
-        Throwable(ErrorAPI.CONNECTION_ERROR)
-    } else {
-        this
-    }
-}

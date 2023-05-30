@@ -10,6 +10,5 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         ConstantsApi.VARIANT_URL = BuildConfig.BASE_URL
-
     }
 }

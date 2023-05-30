@@ -63,9 +63,7 @@ abstract class BaseActivity(private val layoutResource: Int) : AppCompatActivity
                 // no need
                 Toast.makeText(this, "unauth", Toast.LENGTH_SHORT).show()
             }
-            ErrorAPI.CONNECTION_ERROR -> {
-                Toast.makeText(this, "error connection", Toast.LENGTH_SHORT).show()
-            }
+
             else -> {
                 if (th.cause is CustomErrorThrow) {
                     val cause = th.cause as CustomErrorThrow
