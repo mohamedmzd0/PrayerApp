@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.app.base.BaseActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mohamed.prayerapp.ui.prayer.PrayersTimeViewModel
 import com.mohamed.prayerapp.utils.LocationHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,17 +21,39 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
 
     private val viewModel: PrayersTimeViewModel by viewModels()
     private val locationHelper: LocationHelper by lazy {
-        LocationHelper(this) {
-            if (it != null && it.first != 0.0 && it.second != 0.0)
-                viewModel.getPrayersTime(it.first, it.second)
-        }
+        LocationHelper(
+            activity = this,
+            onLocationReceived = ::sendRequest,
+            showPermissionDeniedDialog = ::showPermissionDeniedDialog
+        )
     }
+
 
     override fun onStart() {
         super.onStart()
 
         checkRequest()
 
+    }
+
+    private fun showPermissionDeniedDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.permission_denied))
+            .setMessage(getString(R.string.permission_denied_message))
+            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setNegativeButton(getString(R.string.retry)) { dialog, _ ->
+                dialog.dismiss()
+                checkRequest()
+            }
+            .setCancelable(false)
+            .create().show()
+    }
+
+    private fun sendRequest(pair: Pair<Double, Double>?) {
+        if (pair != null && pair.first != 0.0 && pair.second != 0.0)
+            viewModel.getPrayersTime(pair.first, pair.second)
     }
 
     private fun checkRequest() {

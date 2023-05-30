@@ -1,10 +1,10 @@
 package com.app.data.repository
 
-import com.app.data.remote.UserApi
+import com.app.data.remote.AppApi
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class AppRepoImpl @Inject constructor(private val userApi: UserApi) : AppRepo {
+class AppRepoImpl @Inject constructor(private val userApi: AppApi) : AppRepo {
     // get pray times
     override suspend fun getPrayerTimes(
         time: String,

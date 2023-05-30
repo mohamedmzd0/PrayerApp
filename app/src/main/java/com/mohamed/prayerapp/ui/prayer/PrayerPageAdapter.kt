@@ -67,23 +67,20 @@ class PrayerPageAdapter(private val onNextPress: () -> Unit, private val onPrevP
 
     private fun getDurationBetweenPrayerAndCurrentTime(prayer: PrayItem): String {
         val pattern = "hh:mm a"
-        val currentCalender= Calendar.getInstance()
+        val currentCalender = Calendar.getInstance()
         val formatter = SimpleDateFormat(pattern, Locale.US)
         val prayerTime = formatter.parse(prayer.time)
-        val prayerCalender= Calendar.getInstance().apply { time=prayerTime }
+        val prayerCalender = Calendar.getInstance().apply { time = prayerTime }
         prayerCalender.apply {
-            set(Calendar.YEAR,currentCalender.get(Calendar.YEAR))
-            set(Calendar.MONTH,currentCalender.get(Calendar.MONTH))
-            set(Calendar.DAY_OF_MONTH,currentCalender.get(Calendar.DAY_OF_MONTH))
-            set(Calendar.SECOND,0)
-            set(Calendar.MILLISECOND,0)
-
+            set(Calendar.YEAR, currentCalender.get(Calendar.YEAR))
+            set(Calendar.MONTH, currentCalender.get(Calendar.MONTH))
+            set(Calendar.DAY_OF_MONTH, currentCalender.get(Calendar.DAY_OF_MONTH))
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
-        Log.e(
-            "TAG",
-            "getDurationBetweenPrayerAndCurrentTime: ${prayerCalender.time}  ,currnet ${currentCalender.time}",
-        )
-
+        if (prayerCalender.time.time < currentCalender.time.time) {
+            prayerCalender.add(Calendar.DAY_OF_YEAR, 1)
+        }
         val durationInMillis = prayerCalender.time.time - currentCalender.time.time
         val hours = TimeUnit.MILLISECONDS.toHours(durationInMillis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(durationInMillis) % 60

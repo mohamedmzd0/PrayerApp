@@ -2,9 +2,7 @@ package com.app.di
 
 
 import com.app.data.BuildConfig
-import com.app.data.cache.PreferencesGateway
-import com.app.data.remote.UserApi
-import com.app.data.utils.ConstantsApi.PrefKeys.TOKEN
+import com.app.data.remote.AppApi
 import com.app.data.utils.ConstantsApi.VARIANT_URL
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -81,7 +79,7 @@ object NetWorkModule {
     }
 
     @Provides
-    fun provideUserApi(retrofit: Retrofit): UserApi {
-        return retrofit.create(UserApi::class.java)
+    fun provideUserApi(retrofit: Retrofit): AppApi {
+        return retrofit.create(AppApi::class.java)
     }
 }

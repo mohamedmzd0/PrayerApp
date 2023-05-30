@@ -10,6 +10,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,7 +21,8 @@ private const val TAG = "LocationHelper"
 
 class LocationHelper(
     private val activity: Activity,
-    private val onLocationReceived: (Pair<Double, Double>?) -> Unit
+    private val onLocationReceived: (Pair<Double, Double>?) -> Unit,
+    private val showPermissionDeniedDialog: (() -> Unit)?=null
 ) {
     companion object {
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
@@ -59,11 +61,11 @@ class LocationHelper(
         )
     }
 
-    fun isGpsEnabled(): Boolean {
+    private fun isGpsEnabled(): Boolean {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
-    fun openGpsSettings() {
+    private fun openGpsSettings() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         activity.startActivity(intent)
     }
@@ -145,8 +147,8 @@ class LocationHelper(
                 // Location permission granted, proceed to check GPS status
                 checkGpsStatus()
             } else {
-                // Location permission denied
-                // Handle the denial or display a message to the user
+                // permission denied
+                showPermissionDeniedDialog?.invoke()
             }
         }
     }

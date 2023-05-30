@@ -26,8 +26,6 @@ abstract class BaseActivity(private val layoutResource: Int) : AppCompatActivity
     private var viewBase: ActivityBaseBinding? = null
     var savedInstanceState: Bundle? = null
 
-    private val baseViewModel: BaseViewModel by viewModels()
-
     open fun setActions() {}
 
 
@@ -46,45 +44,11 @@ abstract class BaseActivity(private val layoutResource: Int) : AppCompatActivity
         //setContentView(layoutResource)
         this.savedInstanceState = savedInstanceState
         setActions()
-        observeUnAuthorized()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         viewBase = null
-    }
-
-
-    private fun inflateLayout(progressRes: Int) {
-        //viewBase?.flProgress?.show()
-        //viewBase?.flContent?.removeAllViews()
-        val progressViewRes = progressRes
-        val progress = LayoutInflater.from(this)
-            .inflate(progressViewRes, viewBase?.flContent, false) as ViewGroup
-        viewBase?.flContent?.addView(progress)
-    }
-
-    private fun inflateMain(layoutResource: Int) {
-        //viewBase?.flProgress?.show()
-        viewBase?.flContent?.removeAllViewsInLayout()
-
-        val progress = LayoutInflater.from(this)
-            .inflate(layoutResource, viewBase?.flContent, false) as ViewGroup
-        viewBase?.flContent?.addView(progress)
-    }
-
-
-    private fun observeUnAuthorized() {
-        GlobalScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                baseViewModel.unAuthorizedFlow
-                    .collect {
-
-                    }
-            }
-        }
-
-
     }
 
 
@@ -96,6 +60,7 @@ abstract class BaseActivity(private val layoutResource: Int) : AppCompatActivity
                 Toast.makeText(this, "bad request", Toast.LENGTH_SHORT).show()
             }
             ErrorAPI.UNAUTHRIZED -> {
+                // no need
                 Toast.makeText(this, "unauth", Toast.LENGTH_SHORT).show()
             }
             ErrorAPI.CONNECTION_ERROR -> {
@@ -113,48 +78,6 @@ abstract class BaseActivity(private val layoutResource: Int) : AppCompatActivity
             }
         }
         return null
-    }
-
-
-    fun showProgressFullScreen() {
-        inflateLayout(R.layout.progress_dialog)
-
-    }
-
-    fun hideProgressFullScreen(res: Int) {
-
-        inflateMain(res)
-
-    }
-
-
-    fun handleSharedFlow(
-        userFlow: SharedFlow<NetWorkState>,
-        onShowProgress: (() -> Unit)? = null,
-        onHideProgress: (() -> Unit)? = null,
-        onSuccess: (data: Any) -> Unit,
-        onError: ((th: Throwable) -> Unit)? = null
-    ) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                userFlow.collect { networkState ->
-                    when (networkState) {
-                        is NetWorkState.Success<*> -> {
-                            onSuccess(networkState.data!!)
-                        }
-
-                        is NetWorkState.Error -> {
-                            if (onError == null) handleErrorGeneral(networkState.th) else onError(
-                                networkState.th
-                            )
-                        }
-
-                        else -> {
-                        }
-                    }
-                }
-            }
-        }
     }
 
 

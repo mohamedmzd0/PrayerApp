@@ -1,14 +1,15 @@
 package com.app.usecase
 
-import android.util.Log
 import com.app.data.model.pray_times.PrayItem
 import com.app.data.model.pray_times.PrayerTimes
+import com.app.data.model.qibla.QiblaDirection
 import com.app.data.repository.AppRepo
+import com.app.data.utils.ErrorAPI
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 private const val TAG = "AppUseCase"
@@ -18,35 +19,30 @@ class AppUseCase @Inject constructor(private val repo: AppRepo) {
 
     suspend fun getPrayerTimes(
         latitude: Double,
-        longitude: Double
-    ) = repo.getPrayerTimes(getCurrentDate(), latitude, longitude).map { pray ->
-
-
-        (pray.body()?.data as ArrayList<PrayerTimes>).map { item ->
-            item.apply {
-                this.timingsArrayList.clear()
-                this.timingsArrayList.add(PrayItem("Fajr", convertTime(item.timings?.Fajr)))
-                this.timingsArrayList.add(PrayItem("Sunrise", convertTime(item.timings?.Sunrise)))
-                this.timingsArrayList.add(PrayItem("Dhuhr", convertTime(item.timings?.Dhuhr)))
-                this.timingsArrayList.add(PrayItem("Asr", convertTime(item.timings?.Asr)))
-                this.timingsArrayList.add(PrayItem("Maghrib", convertTime(item.timings?.Maghrib)))
-                this.timingsArrayList.add(PrayItem("Isha", convertTime(item.timings?.Isha)))
-//                this.timingsArrayList.add(PrayItem("Imsak", convertTime(item.timings?.Imsak)))
-//                this.timingsArrayList.add(PrayItem("Midnight", convertTime(item.timings?.Midnight)))
-//                this.timingsArrayList.add(PrayItem("Firstthird", convertTime(item.timings?.Firstthird)))
-//                this.timingsArrayList.add(PrayItem("Lastthird", convertTime(item.timings?.Lastthird)))
-                this.timingsArrayList.filter { !it.time.isNullOrBlank() || !it.time.isNullOrEmpty() }
+        longitude: Double,
+        time: String? = null
+    )= repo.getPrayerTimes(
+        time ?: getCurrentDate(),
+        latitude,
+        longitude
+    ).map { pray ->
+        pray.body()?.data?.let { prayerTimes ->
+            prayerTimes.map { item ->
+                item.apply {
+                    this.timingsArrayList.clear()
+                    this.timingsArrayList.add(PrayItem("Fajr", convertTime(item.timings?.Fajr)))
+                    this.timingsArrayList.add(PrayItem("Sunrise", convertTime(item.timings?.Sunrise)))
+                    this.timingsArrayList.add(PrayItem("Dhuhr", convertTime(item.timings?.Dhuhr)))
+                    this.timingsArrayList.add(PrayItem("Asr", convertTime(item.timings?.Asr)))
+                    this.timingsArrayList.add(PrayItem("Maghrib", convertTime(item.timings?.Maghrib)))
+                    this.timingsArrayList.add(PrayItem("Isha", convertTime(item.timings?.Isha)))
+                    this.timingsArrayList.filter { !it.time.isNullOrBlank() || !it.time.isNullOrEmpty() }
+                }
+                item.nextPrayingTime = getNextPrayingItem(item.timingsArrayList)
             }
-
-
-
-            item.nextPrayingTime = getNextPrayingItem(item.timingsArrayList)
-        }
-        pray
-    }
-        .transformResponseData {
-            emit(it)
-        }
+            pray
+        } ?: throw Throwable(ErrorAPI.SERVER_ERROR)
+    }.transformResponseData { emit(it) }
 
 
     private fun convertTime(string: String?) = convertToAMPM(extractTimeFromString(string))
@@ -62,32 +58,26 @@ class AppUseCase @Inject constructor(private val repo: AppRepo) {
         return sdf12.format(date ?: "")
     }
 
-    private fun getNextPrayingItem(timingArrayList: ArrayList<PrayItem>): PrayItem? {
-        val currentTime = Calendar.getInstance()
+    fun getCalender() = Calendar.getInstance()
 
-        Log.e(TAG, "getNextPrayingItem: current time ${currentTime.time}")
-        val sortedPrayerItems = timingArrayList
-            .filter { !it.time.isNullOrBlank() }
-            .sortedBy { parseTime(it.time, currentTime) }
-
-
-        for (prayerItem in sortedPrayerItems) {
+    private fun getNextPrayingItem(sortedList: ArrayList<PrayItem>): PrayItem? {
+        val currentTime = getCalender()
+        for (prayerItem in sortedList) {
             val prayerTime = parseTime(prayerItem.time, currentTime)
-            Log.e(TAG, "getNextPrayingItem: pray time ${prayerTime.time} ")
             if (prayerTime.after(currentTime)) {
                 return prayerItem
             }
         }
-        return sortedPrayerItems.firstOrNull()
+        return sortedList.firstOrNull()
     }
 
+
     private fun parseTime(time: String?, currentTime: Calendar): Calendar {
-        val calendar = Calendar.getInstance()
+        val calendar = getCalender()
         time?.let {
-            val pattern = "HH:mm"
+            val pattern = "hh:mm a"
             val formatter = SimpleDateFormat(pattern, Locale.getDefault())
             val parsedDate = formatter.parse(time.substringBefore("(").trim())
-
             parsedDate?.let { date ->
                 calendar.time = date
                 calendar.set(Calendar.YEAR, currentTime.get(Calendar.YEAR))
@@ -100,7 +90,7 @@ class AppUseCase @Inject constructor(private val repo: AppRepo) {
         return calendar
     }
 
-    private fun getCurrentDate(): String {
+    fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy/M", Locale.US)
         val currentDate = Date()
         return dateFormat.format(currentDate)
@@ -110,4 +100,6 @@ class AppUseCase @Inject constructor(private val repo: AppRepo) {
         latitude: Double,
         longitude: Double
     ) = repo.getQiblaDirection(latitude, longitude).transformResponseData { emit(it) }
+
+
 }

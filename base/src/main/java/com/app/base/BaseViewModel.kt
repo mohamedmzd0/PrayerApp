@@ -15,47 +15,15 @@ open class BaseViewModel : ViewModel() {
 
 
     private val parentJob = Job()
-
-    private val _unAuthorizedFlow = MutableSharedFlow<Boolean>()
-    internal val unAuthorizedFlow = _unAuthorizedFlow.asSharedFlow()
-
-    private val _connectionErrorFlow = MutableSharedFlow<Boolean>()
-    internal val connectionErrorFlow = _connectionErrorFlow.asSharedFlow()
-
-
-    private fun handler(state: MutableStateFlow<NetWorkState>): CoroutineExceptionHandler {
-        return CoroutineExceptionHandler { coroutineContext, throwable ->
-            when (throwable.message) {
-                ErrorAPI.UNAUTHRIZED -> {
-                    _unAuthorizedFlow.tryEmit(true)
-                }
-                else -> {
-                    state.value = NetWorkState.Error(throwable.handleException())
-                }
-            }
-        }
-    }
-
     private fun handlerShared(state: MutableSharedFlow<NetWorkState>): CoroutineExceptionHandler {
         return CoroutineExceptionHandler { coroutineContext, throwable ->
-            //Log.e("error..",throwable.message.toString())
             when (throwable.message) {
                 ErrorAPI.UNAUTHRIZED -> {
-                    _unAuthorizedFlow.tryEmit(true)
                 }
                 else -> {
                     state.tryEmit(NetWorkState.Error(throwable.handleException()))
                 }
             }
-        }
-    }
-
-
-    fun executeApi(
-        state: MutableStateFlow<NetWorkState>, job: Job = parentJob, action: suspend () -> Unit
-    ) {
-        viewModelScope.launch(handler(state)) {
-            action()
         }
     }
 

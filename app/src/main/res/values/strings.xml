@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">PrayerApp</string>
     <string name="next_prayer">Next Prayer</string>
+    <string name="permission_denied">"Permission denied "</string>
+    <string name="permission_denied_message">Can\'t load data without location , data dispalyed according to user location</string>
+    <string name="ok">ok</string>
+    <string name="retry">request again</string>
 </resources>

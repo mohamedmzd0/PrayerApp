@@ -24,14 +24,14 @@ class QiblaFragment : BaseFragment(R.layout.fragment_qibla), SensorEventListener
 
     private var userLoc: Location? = null
     private val locationHelper by lazy {
-        LocationHelper(requireActivity()) {
+        LocationHelper(requireActivity(), {
             it?.let { it1 ->
                 setCurrentLocation(it1)
                 userLoc = Location("service Provider").apply {
                     latitude = it1.first; longitude = it1.second
                 }
             }
-        }
+        })
     }
 
     private fun setCurrentLocation(it: Pair<Double, Double>) {

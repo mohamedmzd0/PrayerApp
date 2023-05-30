@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="you_should_login_first">يجب تسجيل الدخول أولاً</string>
-    <string name="register">تسجيل حساب جديد</string>
-    <string name="you_have_unauthorized">لقد تم تعطيل حسابك من قبل الادارة برجاء التواصل معهم</string>
-    <string name="choose_completion_method" tools:ignore="ExtraTranslation">اختر طريقة الاستكمال</string>
-</resources>

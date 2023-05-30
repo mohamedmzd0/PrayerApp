@@ -11,12 +11,12 @@ import javax.inject.Inject
 class PrayersTimeViewModel @Inject constructor(private val useCase: AppUseCase) : BaseViewModel() {
 
     // prayers flow
-    private val _prayersFlow = MutableSharedFlow<NetWorkState>()
+    private val _prayersFlow = MutableStateFlow<NetWorkState>(NetWorkState.Loading)
     val prayersFlow = _prayersFlow.asSharedFlow()
 
 
     // qibla flow
-    private val _qiblaFlow = MutableSharedFlow<NetWorkState>()
+    private val _qiblaFlow = MutableStateFlow<NetWorkState>(NetWorkState.Loading)
     val qiblaFlow = _qiblaFlow.asSharedFlow()
 
     // get prayers time

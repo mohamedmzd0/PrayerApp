@@ -1,6 +1,6 @@
 package com.app.data.repository
 
-import com.app.data.model.EndPointResponse
+import com.app.data.model.BaseEndPointResponse
 import com.app.data.model.pray_times.PrayerTimes
 import com.app.data.model.qibla.QiblaDirection
 import kotlinx.coroutines.flow.Flow
@@ -13,11 +13,11 @@ interface AppRepo {
         time: String,
         latitude: Double,
         longitude: Double
-    ): Flow<Response<EndPointResponse<ArrayList<PrayerTimes>>>>
+    ): Flow<Response<BaseEndPointResponse<ArrayList<PrayerTimes>>>>
 
     // get qibla direction
     suspend fun getQiblaDirection(
         latitude: Double,
         longitude: Double
-    ): Flow<Response<EndPointResponse<QiblaDirection>>>
+    ): Flow<Response<BaseEndPointResponse<QiblaDirection>>>
 }
