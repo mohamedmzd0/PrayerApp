@@ -26,7 +26,7 @@ To get started with the project, follow these steps:
 
 ```shell
 # Example usage commands or code snippets
-$ git clone https://github.com/mohamedmzd0/PrayerApp/.git
+$ git clone https://github.com/mohamedmzd0/PrayerApp.git
 $ cd your-repo/
 $ ./gradlew build
 $ ./gradlew run
