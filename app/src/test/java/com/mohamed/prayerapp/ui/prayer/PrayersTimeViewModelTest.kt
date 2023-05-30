@@ -78,6 +78,8 @@ class PrayersTimeViewModelTest {
         viewModel.prayersFlow.test {
             viewModel.getPrayersTime(0.0, 0.0)
             assertEquals(awaitItem(), NetWorkState.Loading)
+
+            assertEquals(awaitItem(), NetWorkState.Success(null))
             val result = awaitItem() as NetWorkState.Error
             assertEquals(error, result.th)
             assertEquals(awaitItem(), NetWorkState.DismissLoading)

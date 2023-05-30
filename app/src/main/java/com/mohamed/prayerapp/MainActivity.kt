@@ -22,8 +22,9 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
     override fun onStart() {
         super.onStart()
         checkRequest()
-    }
 
+
+    }
 
 
     private val viewModel: PrayersTimeViewModel by viewModels()
@@ -34,7 +35,6 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
             showPermissionDeniedDialog = ::showPermissionDeniedDialog
         )
     }
-
 
 
     private fun showPermissionDeniedDialog() {
@@ -53,8 +53,8 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
     }
 
     private fun sendRequest(pair: Pair<Double, Double>?) {
-        if (pair != null && pair.first != 0.0 && pair.second != 0.0)
-            viewModel.getPrayersTime(pair.first, pair.second)
+//        if (pair != null && pair.first != 0.0 && pair.second != 0.0)
+        viewModel.getPrayersTime(pair?.first ?: 0.0, pair?.second ?: 0.0)
     }
 
     private fun checkRequest() {

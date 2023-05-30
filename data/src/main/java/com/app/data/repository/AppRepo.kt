@@ -1,6 +1,7 @@
 package com.app.data.repository
 
 import com.app.data.model.BaseEndPointResponse
+import com.app.data.model.pray_times.PrayItem
 import com.app.data.model.pray_times.PrayerTimes
 import com.app.data.model.qibla.QiblaDirection
 import kotlinx.coroutines.flow.Flow
@@ -20,4 +21,10 @@ interface AppRepo {
         latitude: Double,
         longitude: Double
     ): Flow<Response<BaseEndPointResponse<QiblaDirection>>>
+
+
+    suspend fun saveToDB(array: Array<PrayerTimes>)
+
+    suspend fun getFromDB(): List<PrayerTimes>
+    suspend fun resetDB()
 }

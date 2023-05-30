@@ -1,10 +1,13 @@
 package com.mohamed.prayerapp.ui.prayer
 
+import androidx.lifecycle.viewModelScope
 import com.app.base.BaseViewModel
 import com.app.data.remote.NetWorkState
 import com.app.usecase.AppUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,15 +22,22 @@ class PrayersTimeViewModel @Inject constructor(private val useCase: AppUseCase) 
     private val _qiblaFlow = MutableStateFlow<NetWorkState>(NetWorkState.Loading)
     val qiblaFlow = _qiblaFlow.asSharedFlow()
 
+
     // get prayers time
-    fun getPrayersTime( latitude: Double, longitude: Double) {
+    fun getPrayersTime(latitude: Double, longitude: Double) {
         executeSharedApi(_prayersFlow) {
-            useCase.getPrayerTimes( latitude, longitude)
-                .onStart { _prayersFlow.emit(NetWorkState.Loading) }
+
+
+            useCase.getPrayerTimes(latitude, longitude)
+                .onStart {
+                    _prayersFlow.emit(NetWorkState.Loading)
+                    _prayersFlow.emit(NetWorkState.Success(useCase.loadFromDB()))
+                }
                 .catch { _prayersFlow.emit(NetWorkState.Error(it)) }
                 .onCompletion { _prayersFlow.emit(NetWorkState.DismissLoading) }
                 .collectLatest { _prayersFlow.emit(NetWorkState.Success(it)) }
         }
+
     }
 
     // get qibla direction
