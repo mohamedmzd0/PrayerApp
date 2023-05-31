@@ -5,11 +5,11 @@ App to get prayer's time according to your location , save it offline , show qib
 
 ## Technologies Used
 
-- Retrofit: Explain how Retrofit is used in your project and its purpose.
-- RoomDB: Describe the usage of RoomDB and how it helps in managing the local database.
-- Clean Architecture: Explain how the project follows the principles of clean architecture and the benefits it provides.
-- Hilt DI: Describe the usage of Hilt for dependency injection and how it simplifies the management of dependencies.
-- Unit Test: Highlight the importance of unit testing in the project and how it ensures the reliability of the codebase.
+- Retrofit.
+- Room
+- Clean Architecture
+- Hilt DI
+- Unit Test
 
 ## Getting Started
 
